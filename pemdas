@@ -1,0 +1,163 @@
+#!/usr/bin/python
+
+# This program reads in a file from the command line and generates 
+# mnemonic passwords from the lines of input. 
+
+import sys
+import string
+
+# Open a file from the command line arguments 
+fileName = str(sys.argv[1])
+fo = open(fileName, "r+")
+contents = fo.read()
+
+# Remove all punctuation from the contents of the file
+contents = contents.translate(string.maketrans("",""), string.punctuation)
+
+# Split file contents into lines based on newlines
+lines =  contents.split("\n")
+
+# For each line, generate a basic mnomonic and add additional characters 
+# to the list of possible characters (based on the original letter).
+# Then, compute all the possible combinations of these characters.  
+for line in lines:
+    words = line.split();
+    lineLength = len(words)
+
+    # Ignore lines that are less than 8 words long    
+    if (lineLength < 8):
+        continue
+    
+    # Build basic 8 character mnemonic password from line 
+    charArray = []
+    counter = 0;
+    for word in words:
+        # Truncate lines that are more than 8 words long
+        if (counter >= 8):
+            break
+        
+        # Start buidling a multidimensional array for all possible characters
+        charArray.append([])
+        firstLetter = word[0];        
+
+        # Add lower & upper case letters to list of possibilities
+        charArray[counter].append(firstLetter.lower())
+        charArray[counter].append(firstLetter.upper())
+
+	# Add different, creative characters to the 2D array of possibilities
+        # Start by adding characters that look like original characters
+        if ((firstLetter == "a") or (firstLetter == "A")):
+            charArray[counter].append("@")
+            charArray[counter].append("4")
+        if ((firstLetter == "b") or (firstLetter == "B")):
+            charArray[counter].append("8")
+        if ((firstLetter == "e") or (firstLetter == "E")):
+            charArray[counter].append("3")
+        if ((firstLetter == "h") or (firstLetter == "H")):
+            charArray[counter].append("4")
+        if ((firstLetter == "k") or (firstLetter == "K")):
+            charArray[counter].append("X")  
+        if ((firstLetter == "i") or (firstLetter == "I")):
+            charArray[counter].append("1")
+        if ((firstLetter == "l") or (firstLetter == "L")):
+            charArray[counter].append("1")
+        if ((firstLetter == "o") or (firstLetter == "O")):
+            charArray[counter].append("0")
+        if ((firstLetter == "s") or (firstLetter == "S")):
+            charArray[counter].append("$")
+            charArray[counter].append("5")
+        if ((firstLetter == "t") or (firstLetter == "T")):
+            charArray[counter].append("7")
+        if ((firstLetter == "z") or (firstLetter == "Z")):
+            charArray[counter].append("2")    
+
+        # Add characters that sound like other words
+        if ((word.lower() == "one") or (word.lower() == "ones") or (word.lower() == "once")):
+            charArray[counter].append("1")
+        if ((word.lower() == "to") or (word.lower() == "too") or (word.lower() == "two")):
+            charArray[counter].append("2")
+        if (word.lower() == "three"):
+            charArray[counter].append("3")
+        if ((word.lower() == "four")  or (word.lower() == "forces") or (word.lower()== "far")):
+            charArray[counter].append("4")
+        if ("for" in word.lower()):
+            charArray[counter].append("4")
+        if ((word.lower() == "five")):
+            charArray[counter].append("5")
+        if ((word.lower() == "six")):
+            charArray[counter].append("6")
+        if ((word.lower() == "seven")):
+            charArray[counter].append("7")
+        if ((word.lower() == "eight")):
+            charArray[counter].append("8")
+        if ((word.lower() == "nine")):
+            charArray[counter].append("9")
+        if ((word.lower() == "zero")):
+            charArray[counter].append("0")
+
+        if (word.lower() == "and"):
+            charArray[counter].append("&")
+        if (word.lower() == "divide"):
+            charArray[counter].append("/")
+        if (word.lower() == "or"):
+            charArray[counter].append("|") 
+        if (word.lower() == "you" or word.lower() == "your"):
+            charArray[counter].append("u")
+            charArray[counter].append("U")
+        if (word.lower() == "why"):
+            charArray[counter].append("y")
+            charArray[counter].append("Y")
+        if (word.lower() == "our" or word.lower() == "are"):
+            charArray[counter].append("r")
+            charArray[counter].append("R")
+        if (word.lower() == "not" or word.lower() == "no"):
+            charArray[counter].append("!")
+        if (word.lower() == "see" or word.lower() == "sea" or word.lower() == "seem" or word.lower() == "seek"):
+            charArray[counter].append("c")
+            charArray[counter].append("C")
+        if (word.lower() == "in" or word.lower() == "into"):
+            charArray[counter].append("n")
+            charArray[counter].append("N")
+        
+        counter += 1
+  
+    # Now that we have built our multidimensional array of possible characters 
+    # for each character index of the mnemonic, we must systematically generate 
+    # all possible combinations of these characters. We will start by keeping 
+    # a counters array that keeps track of the indexes of the 2D array we are 
+    # currently generating
+    counters = [0, 0, 0, 0, 0, 0, 0, 0]
+
+    # Loop will run until the index we update has reached the leftmost edge of 
+    # our array (loop terminated below) 
+    while (1):
+        
+        # Generate the menomic using the counters array values (updated below)
+        newMnemonic = ""
+         
+        newMnemonic += charArray[0][counters[0]] + charArray[1][counters[1]]
+        newMnemonic += charArray[2][counters[2]] + charArray[3][counters[3]] 
+        newMnemonic += charArray[4][counters[4]] + charArray[5][counters[5]]
+        newMnemonic += charArray[6][counters[6]] + charArray[7][counters[7]]
+
+        # Output the new mnemonic
+        print newMnemonic
+
+        # Index always starts from beginning (rightmost edge) of our 2D array
+        index = 7
+        
+        # Scan through the array from right to left, looking for a valid index
+        # that has not reached the end of the possible characters. Update the 
+        # counters array accordingly
+        while ((index >= 0) and (counters[index] == len(charArray[index])-1)):
+            counters[index] = 0
+            index -= 1
+      
+        # Until our index reaches the leftmost end of our character array, 
+        # we will increment the counters array at that index to try the next 
+        # character
+        if (index != -1):
+            counters[index] += 1
+        # When the index reaches past the leftmost edge of the array, break from loop
+        else:
+           break

@@ -1,0 +1,47 @@
+#!/usr/bin/python
+
+# This is a python program that is intended to compare the results of
+# my mnemonic password generator program with the hashed results of 
+# the instructor's program and report the percetage of the same hashes
+
+import sys
+import string
+import hashlib
+
+# Open up the files passed into the command line as arguements
+fileName1 = str(sys.argv[1])
+fileName2 = str(sys.argv[2])
+myOutputFile = open(fileName1, "r+")
+hashesFile = open(fileName2, "r+")
+
+myOutput = myOutputFile.read()
+hashes = hashesFile.read()
+  
+# Split file contents into lines based on newlines
+myOutputLines =  myOutput.split("\n")
+hashesLines = hashes.split("\n")
+
+counter = 0
+sameHashesCounter = 0
+print "Hashes to compare:", len(hashesLines)
+print "My mnmonics:", len(myOutputLines)
+
+# For all of my mnomonic passwords I generated, hash it and compare
+# it with the instructor's hashes
+for line in myOutputLines:
+    line = hashlib.sha1(line).hexdigest()
+    # If match if found, update counter
+    if line in hashesLines:
+        sameHashesCounter += 1
+    # Just some output to show progress while waiting
+    if (counter % 10000) == 0:
+        print "%", float(counter) / float(len(myOutputLines))
+    counter += 1
+
+totalPasswords = len(hashesLines)
+print "total passwords:", totalPasswords
+print "total matches:", sameHashesCounter
+
+# Report the percentage of matches. Must be at least above %70
+myPercentage = float(sameHashesCounter) / float(totalPasswords)
+print myPercentage * 100
